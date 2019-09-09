@@ -27,8 +27,8 @@ def training_testing_split(df):
     
 
     # Shuffling the lists
-    random.shuffle(positive_index)
-    random.shuffle(negative_index)
+    random.Random(4).shuffle(positive_index)
+    random.Random(4).shuffle(negative_index)
     
     # Taking the first 5 elements from shuffled lists
     test_positive = positive_index[:5]
@@ -58,7 +58,7 @@ def train(train_df):
     positive_likelihood = []
     negative_likelihood = []
 
-    for i in train_df.columns:
+    for i in train_df.columns[:-1]:
         positive_likelihood.append(dict(positive_df[i].value_counts()/len(positive_df)))
         negative_likelihood.append(dict(negative_df[i].value_counts()/len(negative_df)))
 
@@ -72,8 +72,16 @@ def test(test_df, positive_likelihood, negative_likelihood, prior):
         negative_posterior = prior['negative']
 
         for i in range(10):
-            positive_posterior *= positive_likelihood[i][row[i]]
-            negative_posterior *= negative_likelihood[i][row[i]]
+            if row[i] in positive_likelihood[i]:
+                positive_posterior *= positive_likelihood[i][row[i]]    # row[i] = value of the column, 
+            else:
+                positive_posterior *= 0
+            
+            if row[i] in negative_likelihood[i]:
+                negative_posterior *= negative_likelihood[i][row[i]]
+            else:
+                negative_posterior *= 0
+            
         
         if positive_posterior >= negative_posterior:
             predictions.append('positive')
@@ -92,11 +100,13 @@ def main():
     test_df = test_df.loc[:, ~test_df.columns.str.contains('^Unnamed')]
     
     positive_likelihood, negative_likelihood, prior = train(train_df)
-    print(positive_likelihood)
-    print(negative_likelihood)
-    print(prior)
     predictions = test(test_df, positive_likelihood, negative_likelihood, prior)
-    print(predictions)
+    test_df['predictions'] = predictions
+
+    accuracy = sum(test_df['rating'] == test_df['predictions'])*100/len(test_df)
+    print('Accuracy =', accuracy)
+    mispredicted_rnum = test_df[test_df['predictions'] != test_df['rating']].index
+    print('The mispredicted rows are ' ,mispredicted_rnum)
 
 if __name__ == '__main__':
     main()
