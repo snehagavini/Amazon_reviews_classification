@@ -20,8 +20,7 @@ def get_html(url):
     
     # Remove all the null bytes from the response
     cleaned_response = response.text.replace('\x00','')
-
-    parser = html.fromstring(cleaned_response)
+    parser = html.fromstring(cleaned_response)  
     return parser
     
 def get_a_url(parser_object, XPATH):
@@ -33,8 +32,8 @@ def get_a_url(parser_object, XPATH):
 
 def get_reviews(parser_object, total_reviews):
     
-    XPATH_REVIEW_SECTION = '//div[@data-hook="review"]'
-    reviews = parser_object.xpath(XPATH_REVIEW_SECTION)
+    XPATH_REVIEW_SECTION = '//div[@data-hook="review"]'  
+    reviews = parser_object.xpath(XPATH_REVIEW_SECTION) 
     reviews_list = []
 
     for review in reviews:

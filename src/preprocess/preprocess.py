@@ -7,18 +7,6 @@ import numpy
 from nltk.stem import PorterStemmer
 from collections import Counter
 
-# Input : reading the data from data.
-
-"""
-    Process: 
-        - remove the stop words
-        -group all the strings
-        -count the word frequency
-        -select the 10 fetaures basing on the word count
-       
-"""
-# Output : writing the data to csv file
-
 def get_ratings_reviews(file_name):
     
     ratings = []
@@ -50,7 +38,7 @@ def rem_stopwords(review):
     return revised_review
 
 def process_review(review):
-    regex = re.compile('[^a-zA-Z]')
+    regex = re.compile('[^a-zA-Z]') 
     review = regex.sub(' ',review)
     review = review.lower()    
     review = review.split()
@@ -71,13 +59,13 @@ def grp_reviews(processed_review):
 
 def word_count(grouped_reviews):
     # return [{x : grouped_reviews.count(x)} for x in set(grouped_reviews)]      
-    return Counter(grouped_reviews)
+    return Counter(grouped_reviews) #retrun count of each word as a list
 
 def feature_count(feature_list, processed_review):
     count_vectors = []
     for i in processed_review:
-        count_vectors.append([i.count(j) for j in feature_list])    
-    return count_vectors   
+        count_vectors.append([i.count(j) for j in feature_list])           
+    return count_vectors    # searches each feature count in processed_revie and store as a list.
 
 def assign_categories(dat_frame, condition, cond_vals, col_name, value):
 
@@ -90,7 +78,7 @@ def assign_categories(dat_frame, condition, cond_vals, col_name, value):
 
 def assign_categories_column(dat_frame, bins, names, col_name):
     d = dict(enumerate(names,1))
-    dat_frame[col_name] = numpy.vectorize(d.get)(numpy.digitize(dat_frame[col_name], bins))
+    dat_frame[col_name] = numpy.vectorize(d.get)(numpy.digitize(dat_frame[col_name], bins)) 
 
 def assign_Categories_helper(dat_frame):
 
@@ -156,8 +144,11 @@ def main():
     # Creating the dataframe
     dat_frame = pandas.DataFrame(count_vectors,columns=feature_list)
     dat_frame['rating'] = ratings
+    print( "-------- DATA FRAME OF 50 REVIEWS WITH FEATURE COUNT AND RATINGS---------\n ")
     print(dat_frame)
     assign_Categories_helper(dat_frame)
+    print("\n\n")
+    print( "-------- DATA FRAME OF 50 REVIEWS WITH FEATURE CATEGORIES AND RATINGS--------\n")
     print(dat_frame)
     dat_frame.to_csv("../../data/data.csv")
 
